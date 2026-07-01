@@ -19,7 +19,7 @@ public class PostLikeService {
     public void likePost(Long postId, long userId) {
 
         postRepository.findById(postId).orElseThrow(()->
-                new ResourceNotFoundException("Post not found with id: {}" + postId));
+                new ResourceNotFoundException("Post not found with id: " + postId));
 
         log.info("Attempting to like post for postId: {}", postId);
 

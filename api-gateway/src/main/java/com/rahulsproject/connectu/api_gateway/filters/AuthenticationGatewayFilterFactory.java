@@ -25,9 +25,6 @@ public class AuthenticationGatewayFilterFactory extends AbstractGatewayFilterFac
     public GatewayFilter apply(Config config) {
 
         return (exchange, chain) -> {
-            // Performing authentication
-
-            log.info("config: {}", config.toString());
 
             if(!config.enabled) return chain.filter(exchange);
 
@@ -41,15 +38,12 @@ public class AuthenticationGatewayFilterFactory extends AbstractGatewayFilterFac
             String token = authorizationHeader.split("Bearer ")[1];
 
             Long userId = jwtService.getUserIdFromToken(token);
-
-//            exchange.getRequest()
-//                    .mutate()
-//                    .header("X-User-Id", userId.toString())
-//                    .build();
+            String userEmail = jwtService.getEmailFromToken(token);
 
             ServerHttpRequest request = exchange.getRequest()
                     .mutate()
                     .header("X-User-Id", userId.toString())
+                    .header("X-User-Email", userEmail)
                     .build();
 
             ServerWebExchange mutatedExchange = exchange.mutate()
