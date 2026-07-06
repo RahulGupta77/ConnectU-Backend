@@ -1,5 +1,6 @@
 package com.rahulsproject.connectu.post_service.controller;
 
+import com.rahulsproject.connectu.post_service.auth.UserContextHolder;
 import com.rahulsproject.connectu.post_service.dto.PostCreateRequestDto;
 import com.rahulsproject.connectu.post_service.dto.PostDto;
 import com.rahulsproject.connectu.post_service.service.PostService;
@@ -23,8 +24,9 @@ public class PostsController {
     private final ModelMapper modelMapper;
 
     @PostMapping("/create")
-    public ResponseEntity<PostDto> createPost(@RequestBody PostCreateRequestDto postCreateRequestDto, @RequestHeader("X-User-Id") Long userId){
-        PostDto createdPost = postService.createPost(postCreateRequestDto, userId);
+    public ResponseEntity<PostDto> createPost(@RequestBody PostCreateRequestDto postCreateRequestDto){
+
+        PostDto createdPost = postService.createPost(postCreateRequestDto);
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 

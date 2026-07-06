@@ -1,5 +1,6 @@
 package com.rahulsproject.connectu.api_gateway.filters;
 
+import com.rahulsproject.connectu.api_gateway.exception.JwtException;
 import com.rahulsproject.connectu.api_gateway.service.JwtService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -26,31 +27,41 @@ public class AuthenticationGatewayFilterFactory extends AbstractGatewayFilterFac
 
         return (exchange, chain) -> {
 
+            log.info("Login request: {}", exchange.getRequest().getURI());
+
             if(!config.enabled) return chain.filter(exchange);
 
-            String authorizationHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+            final String authorizationHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-            if(authorizationHeader == null){
+            if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer")){
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                log.error("Authorization token header not found");
                 return exchange.getResponse().setComplete();
             }
 
-            String token = authorizationHeader.split("Bearer ")[1];
+            final String token = authorizationHeader.split("Bearer ")[1];
 
-            Long userId = jwtService.getUserIdFromToken(token);
-            String userEmail = jwtService.getEmailFromToken(token);
+           try{
+               String userId = jwtService.getUserIdFromToken(token);
+               String userEmail = jwtService.getEmailFromToken(token);
 
-            ServerHttpRequest request = exchange.getRequest()
-                    .mutate()
-                    .header("X-User-Id", userId.toString())
-                    .header("X-User-Email", userEmail)
-                    .build();
+               ServerHttpRequest request = exchange.getRequest()
+                       .mutate()
+                       .header("X-User-Id", userId)
+                       .header("X-User-Email", userEmail)
+                       .build();
 
-            ServerWebExchange mutatedExchange = exchange.mutate()
-                    .request(request)
-                    .build();
+               ServerWebExchange mutatedExchange = exchange
+                       .mutate()
+                       .request(request)
+                       .build();
 
-            return chain.filter(mutatedExchange);
+               return chain.filter(mutatedExchange);
+           }catch (JwtException e){
+               log.error("JWT Exception: {}", e.getLocalizedMessage());
+               exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+               return exchange.getResponse().setComplete();
+           }
         };
     }
 

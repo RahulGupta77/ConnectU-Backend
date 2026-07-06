@@ -1,5 +1,6 @@
 package com.rahulsproject.connectu.post_service.service;
 
+import com.rahulsproject.connectu.post_service.auth.UserContextHolder;
 import com.rahulsproject.connectu.post_service.dto.PostCreateRequestDto;
 import com.rahulsproject.connectu.post_service.dto.PostDto;
 import com.rahulsproject.connectu.post_service.entity.Post;
@@ -20,9 +21,10 @@ public class PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
 
-    public PostDto createPost(PostCreateRequestDto postCreateRequestDto, Long userId) {
+    public PostDto createPost(PostCreateRequestDto postCreateRequestDto) {
 
         Post post = modelMapper.map(postCreateRequestDto, Post.class);
+        Long userId = UserContextHolder.getCurrentUserId();
 
         post.setUserId(userId);
 

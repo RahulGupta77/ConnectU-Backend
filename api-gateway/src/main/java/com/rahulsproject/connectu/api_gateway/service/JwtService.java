@@ -19,14 +19,14 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public Long getUserIdFromToken(String token){
+    public String getUserIdFromToken(String token){
         try{
             Claims claim = Jwts.parser()
                     .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-            return Long.valueOf(claim.getSubject());
+            return claim.getSubject();
         }catch (JwtException e){
             throw new JwtException(e.getMessage());
         }
