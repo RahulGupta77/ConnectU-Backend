@@ -1,6 +1,8 @@
 package com.rahulsproject.connectu.post_service.service;
 
 import com.rahulsproject.connectu.post_service.auth.UserContextHolder;
+import com.rahulsproject.connectu.post_service.clients.ConnectionsClient;
+import com.rahulsproject.connectu.post_service.dto.PersonDto;
 import com.rahulsproject.connectu.post_service.dto.PostCreateRequestDto;
 import com.rahulsproject.connectu.post_service.dto.PostDto;
 import com.rahulsproject.connectu.post_service.entity.Post;
@@ -20,6 +22,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
+    private final ConnectionsClient connectionsClient;
 
     public PostDto createPost(PostCreateRequestDto postCreateRequestDto) {
 
@@ -36,6 +39,10 @@ public class PostService {
     public PostDto getPostById(Long postId) {
 
         log.debug("Retrieving Post by Id: {}", postId);
+
+        List<PersonDto> firstDegreeConnections =  connectionsClient.getFirstConnections();
+
+        log.info("First Degree Connections: {}", firstDegreeConnections);
 
         Post post = postRepository.findById(postId).orElseThrow(()->
                 new ResourceNotFoundException("Post not found with Id: "+ postId));

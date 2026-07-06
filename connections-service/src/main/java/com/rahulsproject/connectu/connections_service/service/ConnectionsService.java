@@ -1,5 +1,6 @@
 package com.rahulsproject.connectu.connections_service.service;
 
+import com.rahulsproject.connectu.connections_service.auth.UserContextHolder;
 import com.rahulsproject.connectu.connections_service.entity.Person;
 import com.rahulsproject.connectu.connections_service.repository.PersonsRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,10 @@ import java.util.List;
 public class ConnectionsService {
     private final PersonsRepository personsRepository;
 
-    public List<Person> getFirstDegreeConnections(Long userId){
+    public List<Person> getFirstDegreeConnections(){
+
+        Long userId = UserContextHolder.getCurrentUserId();
+
         log.info("Getting first degree Connections for userId: {}", userId);
 
         return personsRepository.getFirstDegreeConnections(userId);
